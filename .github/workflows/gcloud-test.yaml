@@ -17,12 +17,18 @@ jobs:
         uses: actions/setup-go@v2
         with:
           go-version: '^1.17'
-      - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v0
+#      - name: Set up Cloud SDK
+#        uses: google-github-actions/setup-gcloud@v0
+#        with:
+#          project_id: ory-test-338911
+#          service_account_key: ${{ secrets.TEST_SA_ARTIFACTS }}
+#          export_default_credentials: true
+      - id: 'auth'
+        uses: 'google-github-actions/auth@v0'
         with:
-          project_id: ory-test-338911
-          service_account_key: ${{ secrets.TEST_SA_ARTIFACTS }}
-          export_default_credentials: false
+          credentials_json: '${{ secrets.TEST_SA_ARTIFACTS }}'
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v0'
       - name: Clean
         shell: bash
 #        env:
@@ -32,5 +38,7 @@ jobs:
           echo ${{ inputs.olderThanHours }}
           echo $GOOGLE_APPLICATION_CREDENTIALS
           gcloud version
+          echo "-------"
+          gcloud info
           echo "Finished"
           
