@@ -25,8 +25,8 @@ jobs:
           export_default_credentials: true
       - name: Clean
         shell: bash
-        env:
-          GOOGLE_APPLICATION_CREDENTIALS: "${{ secrets.TODO }}"
+#        env:
+#          GOOGLE_APPLICATION_CREDENTIALS: "${{ secrets.TODO }}"
         run: |
           set -e
           echo ${{ inputs.olderThanHours }}
