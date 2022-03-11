@@ -1,0 +1,27 @@
+name: Build daisy chain test 2
+
+on:
+  # Automatic trigger when pushing tags
+  # push:
+  #   branches:
+  #     - "!*"
+  #   tags:
+  #     - 'v*'
+
+  # Manual trigger from the UI
+  workflow_dispatch:
+    inputs:
+      message:
+        description: 'Build description'
+
+  # Dependency to a forking workflow
+  workflow_run:
+    workflows: ["Build daisy chain test 1"]
+    type:
+      - complete
+jobs:
+  say_hi_2:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Hi123
+        run: echo "Hi!!!!!!"
