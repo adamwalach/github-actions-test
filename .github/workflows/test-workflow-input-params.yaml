@@ -1,0 +1,32 @@
+name: Test input params
+
+on:
+# Automatic trigger when pushing tags
+# push:
+#   branches:
+#     - "!*"
+#   tags:
+#     - 'v*'
+
+# Manual trigger from the UI
+  workflow_dispatch:
+    inputs:
+      test1:
+        type: choice
+        description: Release type
+        options:
+          - 'Full release'
+          - 'Only cherry picks'
+        required: true
+      test3:
+        description: Commit ID's
+        required: false
+        default: ''
+
+jobs:
+  say_hi_2:
+    environment: test-deployment
+    runs-on: ubuntu-latest
+    steps:
+      - name: Hi123
+        run: echo "Hi!!!!!!"

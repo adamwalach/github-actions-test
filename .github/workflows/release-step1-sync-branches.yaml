@@ -1,0 +1,67 @@
+name: Release Step 1 - sync RC branch
+
+on:
+  # Manual trigger from the UI
+  workflow_dispatch:
+    inputs:
+      release_type:
+        type: choice
+        description: Release type
+        options:
+          - 'full-release'
+          - 'cherry-picks'
+        required: true
+      commit_ids:
+        description: Commit ID's
+        required: false
+        default: ''
+concurrency: "sync-to-rc"
+jobs:
+  sync-release-candidate-branch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          token: ${{secrets.GH_PA_TOKEN}}
+      - name: Sync release-candidate branch - full sync
+        shell: bash
+        if: ${{ always() && github.event.inputs.release_type == 'full-release' }}
+        run: |
+          git config --global user.email "you@example.com"
+          git config --global user.name "Your Name"  
+          git branch
+          git fetch origin rc
+          #git reset --hard rc
+          git checkout rc
+          git status
+          git diff ..main | git apply -
+          git add .
+          git commit -m "Sync from master"
+          #git push
+          export NEW_COMMIT_ID=$(git rev-parse HEAD)
+          echo "NEW_COMMIT_ID=$NEW_COMMIT_ID" >> $GITHUB_ENV
+      - name: Sync release-candidate branch - cherry-pick
+        shell: bash
+        if: ${{ always() &&  github.event.inputs.release_type == 'cherry-picks' }}
+        run: |
+          echo "cherry-pick"
+          git config --global user.email "you@example.com"
+          git config --global user.name "Your Name"  
+          git branch
+          git fetch origin rc
+          #git reset --hard rc
+          git checkout rc
+          git status
+          git cherry-pick ${{ github.event.inputs.commit_ids }}
+      - name: Slack Notification
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_MESSAGE: "release-candidate synced :rocket: - https://github.com/adamwalach/github-actions-test/commit/${{env.NEW_COMMIT_ID}}"
+
+#      - name: Create Pull Request
+#        uses: peter-evans/create-pull-request@v3
+#        with:
+#          branch: rc
+#          base: main
