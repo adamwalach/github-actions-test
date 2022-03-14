@@ -1,0 +1,34 @@
+name: Test input params2
+
+on:
+  # Manual trigger from the UI
+  workflow_dispatch:
+    inputs:
+      test1:
+        type: choice
+        description: Release type
+        options:
+          - 'Full release'
+          - 'Only cherry picks'
+        required: true
+      test3:
+        description: Commit ID's
+        required: false
+        default: ''
+      test2:
+        description: Skip long running tests
+        type: boolean
+        required: true
+        default: 'false'
+
+jobs:
+  say_hi_2:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Hi123
+        shell: bash
+        run: |
+          git status
+          git branch
