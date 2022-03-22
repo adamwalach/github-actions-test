@@ -22,14 +22,10 @@ on:
         description: Commit ID's
         required: false
         default: ''
-      test2:
-        description: Skip long running tests
-        type: boolean
-        required: true
-        default: 'false'
 
 jobs:
   say_hi_2:
+    environment: test-deployment
     runs-on: ubuntu-latest
     steps:
       - name: Hi123
