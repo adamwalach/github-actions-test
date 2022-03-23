@@ -15,7 +15,7 @@ on:
         description: Commit ID's
         required: false
         default: ''
-
+concurrency: "sync-to-rc"
 jobs:
   sync-release-candidate-branch:
     runs-on: ubuntu-latest
