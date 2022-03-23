@@ -41,16 +41,11 @@ jobs:
           git push
           export NEW_COMMIT_ID=$(git rev-parse HEAD)
           echo "NEW_COMMIT_ID=$NEW_COMMIT_ID" >> $GITHUB_ENV
-  slackNotification:
-    name: Slack Notification
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
       - name: Slack Notification
         uses: rtCamp/action-slack-notify@v2
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_MESSAGE: "release-candidate synced :rocket: - https://github.com/adamwalach/github-actions-test/commit/$NEW_COMMIT_ID"
+          SLACK_MESSAGE: "release-candidate synced :rocket: - https://github.com/adamwalach/github-actions-test/commit/${{env.NEW_COMMIT_ID}}"
 
 #      - name: Create Pull Request
 #        uses: peter-evans/create-pull-request@v3
