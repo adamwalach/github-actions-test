@@ -1,4 +1,4 @@
-name: Test input params2
+name: Release Step 1 - sync RC branch
 
 on:
   # Manual trigger from the UI
@@ -15,22 +15,16 @@ on:
         description: Commit ID's
         required: false
         default: ''
-      test2:
-        description: Skip long running tests
-        type: boolean
-        required: true
-        default: 'false'
 
 jobs:
-  say_hi_2:
+  sync-release-candidate-branch:
     runs-on: ubuntu-latest
-    environment: test-deployment
     steps:
       - name: Checkout
         uses: actions/checkout@v2
         with:
           token: ${{secrets.GH_PA_TOKEN}}
-      - name: Hi123
+      - name: Sync release-candidate branch
         shell: bash
         run: |
           git config --global user.email "you@example.com"
@@ -45,6 +39,17 @@ jobs:
           git add .
           git commit -m "Sync from master"
           git push
+  slackNotification:
+    name: Slack Notification
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Slack Notification
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_MESSAGE: 'release-candidate synced :rocket:'
+
 #      - name: Create Pull Request
 #        uses: peter-evans/create-pull-request@v3
 #        with:
