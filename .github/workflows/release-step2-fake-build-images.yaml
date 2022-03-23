@@ -16,7 +16,10 @@ jobs:
       - name: Dummy Build
         shell: bash
         run: |
+          echo "REPO: ${{env.GITHUB_REPOSITORY }}"
+          echo "REPO: $GITHUB_REPOSITORY
           echo "RUN ID: ${{env.GITHUB_RUN_ID}}"
+          echo "RUN ID: $GITHUB_RUN_ID"
       - name: Slack Notification
         uses: rtCamp/action-slack-notify@v2
         env:
