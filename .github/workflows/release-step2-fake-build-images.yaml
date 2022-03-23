@@ -1,0 +1,90 @@
+name: Release Step 2 - Fake Build and Create PR to Prod
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - rc
+jobs:
+  dummy-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          token: ${{secrets.GH_PA_TOKEN}}
+      - name: Dummy Build
+        shell: bash
+        run: echo "build"
+      - name: Slack Notification
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_MESSAGE: "images are ready, lets push them, someone needs to approve it: - https://github.com/adamwalach/github-actions-test/"
+
+  dummy-push:
+    runs-on: ubuntu-latest
+    needs: dummy-build
+    environment: test-deployment
+    steps:
+      - name: Push
+        shell: bash
+        run: echo "push"
+      - name: Slack Notification
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_MESSAGE: "images pushed to a production registry"
+
+  dummy-regenerate-and-create-PR:
+    runs-on: ubuntu-latest
+    needs: dummy-push
+    steps:
+      - name: regenerate-prod-templates
+        shell: bash
+        run: echo "regenerate all the things!"
+      - uses: actions/github-script@v6
+        id: set-result
+        with:
+          script: |
+            const PRs = await github.paginate(github.rest.pulls.list, {
+                   owner: 'adamwalach',
+                   repo: 'github-actions-test',
+                   state: 'open',
+                   head: 'rc',
+                   base: 'prod'
+              })
+
+            if (PRs.length === 0){
+              await github.rest.pulls.create({
+                title: "❗ release-candidate ➡️ env-production ❗",
+                owner: 'adamwalach',
+                repo: 'github-actions-test',
+                base: 'prod',
+                head: 'rc',
+                body: '## test \n my new PR'
+              });
+            }else{
+              console.log("update")
+              await github.rest.pulls.update({
+                    owner: 'adamwalach',
+                    repo: 'github-actions-test',
+                    pull_number: PRs[0].number,
+                    body: '## test \n my new PR - update'
+              });
+            }
+
+            return PRs[0].number
+          result-encoding: string
+      - name: Get result
+        shell: bash
+        run: echo "${{steps.set-result.outputs.result}}"
+      - name: Slack Notification
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_MESSAGE: "All green, this is the PR: https://github.com/ory-corp/cloud/pull/${{steps.set-result.outputs.result}}"
+#      - name: Create Pull Request
+#        uses: peter-evans/create-pull-request@v3
+#        with:
+#          branch: rc
+#          base: main
