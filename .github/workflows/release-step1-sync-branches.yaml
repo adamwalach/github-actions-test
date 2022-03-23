@@ -40,7 +40,7 @@ jobs:
           git commit -m "Sync from master"
           git push
           export NEW_COMMIT_ID=$(git rev-parse HEAD)
-          echo "::set-env name=NEW_COMMIT_ID::NEW_COMMIT_ID"
+          run: echo "NEW_COMMIT_ID=$NEW_COMMIT_ID" >> $GITHUB_ENV
   slackNotification:
     name: Slack Notification
     runs-on: ubuntu-latest
