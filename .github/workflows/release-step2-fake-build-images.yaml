@@ -19,11 +19,14 @@ jobs:
           echo "REPO: ${{ env.GITHUB_REPOSITORY }}"
           echo "REPO: $GITHUB_REPOSITORY
           echo "RUN ID: $GITHUB_RUN_ID
+          echo "RUN ID: "$GITHUB_RUN_ID"
+          echo "NEW_COMMIT_ID=$NEW_COMMIT_ID" >> $GITHUB_ENV
+          echo "WORKFLOW_URL=https://github.com/adamwalach/github-actions-test/actions/runs/$GITHUB_ENV" >> $GITHUB_ENV
       - name: Slack Notification
         uses: rtCamp/action-slack-notify@v2
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_MESSAGE: "images are ready, lets push them, someone needs to approve it: - https://github.com/adamwalach/github-actions-test/actions/runs/$GITHUB_RUN_ID"
+          SLACK_MESSAGE: "images are ready, lets push them, someone needs to approve it: - ${{env.WORKFLOW_URL}}"
 
   dummy-push:
     runs-on: ubuntu-latest
