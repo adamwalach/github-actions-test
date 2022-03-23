@@ -15,12 +15,13 @@ jobs:
           token: ${{secrets.GH_PA_TOKEN}}
       - name: Dummy Build
         shell: bash
-        run: echo "build"
+        run: |
+          echo "RUN ID: ${{env.GITHUB_RUN_ID}}"
       - name: Slack Notification
         uses: rtCamp/action-slack-notify@v2
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_MESSAGE: "images are ready, lets push them, someone needs to approve it: - https://github.com/adamwalach/github-actions-test/actions/runs/${{GITHUB_RUN_ID}}"
+          SLACK_MESSAGE: "images are ready, lets push them, someone needs to approve it: - https://github.com/adamwalach/github-actions-test/actions/runs/${{env.GITHUB_RUN_ID}}"
 
   dummy-push:
     runs-on: ubuntu-latest
