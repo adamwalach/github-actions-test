@@ -4,14 +4,14 @@ on:
   # Manual trigger from the UI
   workflow_dispatch:
     inputs:
-      test1:
+      release_type:
         type: choice
         description: Release type
         options:
-          - 'Full release'
-          - 'Only cherry picks'
+          - 'full-release'
+          - 'cherry-picks'
         required: true
-      test3:
+      commit_ids:
         description: Commit ID's
         required: false
         default: ''
@@ -24,8 +24,10 @@ jobs:
         uses: actions/checkout@v2
         with:
           token: ${{secrets.GH_PA_TOKEN}}
-      - name: Sync release-candidate branch
+          fetch-depth: 100
+      - name: Sync release-candidate branch - full sync
         shell: bash
+        if: ${{ always() && github.event.inputs.release_type == 'full-release' }}
         run: |
           git config --global user.email "you@example.com"
           git config --global user.name "Your Name"  
@@ -33,11 +35,27 @@ jobs:
           git fetch origin rc
           #git reset --hard rc
           git checkout rc
-          #git checkout rc
           git status
           git diff ..main | git apply -
           git add .
           git commit -m "Sync from master"
+          git push
+          export NEW_COMMIT_ID=$(git rev-parse HEAD)
+          echo "NEW_COMMIT_ID=$NEW_COMMIT_ID" >> $GITHUB_ENV
+      - name: Sync release-candidate branch - cherry-pick
+        shell: bash
+        if: ${{ always() &&  github.event.inputs.release_type == 'cherry-picks' }}
+        run: |
+          echo "cherry-pick"
+          git config --global user.email "you@example.com"
+          git config --global user.name "Your Name"  
+          git branch
+          git fetch origin rc --prune
+          #git reset --hard rc
+          git checkout rc
+          git pull
+          git status
+          git cherry-pick ${{ github.event.inputs.commit_ids }}
           git push
           export NEW_COMMIT_ID=$(git rev-parse HEAD)
           echo "NEW_COMMIT_ID=$NEW_COMMIT_ID" >> $GITHUB_ENV
