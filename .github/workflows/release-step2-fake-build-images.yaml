@@ -58,9 +58,10 @@ jobs:
                    head: 'rc',
                    base: 'prod'
               })
-
+            let pr_number;
             if (PRs.length === 0){
-              await github.rest.pulls.create({
+              pr_number=0;
+              const test1 = await github.rest.pulls.create({
                 title: "❗ release-candidate ➡️ env-production ❗",
                 owner: 'adamwalach',
                 repo: 'github-actions-test',
@@ -68,17 +69,19 @@ jobs:
                 head: 'rc',
                 body: '## test \n my new PR'
               });
+              console.log(test1);
             }else{
               console.log("update")
-              await github.rest.pulls.update({
+              pr_number=PRs[0].number;
+              constawait github.rest.pulls.update({
                     owner: 'adamwalach',
                     repo: 'github-actions-test',
                     pull_number: PRs[0].number,
                     body: '## test \n my new PR - update'
               });
             }
-
-            return PRs[0].number
+            //TODO: think about new PR
+            return pr_number
           result-encoding: string
       - name: Get result
         shell: bash
