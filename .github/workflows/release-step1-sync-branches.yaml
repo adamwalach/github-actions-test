@@ -24,6 +24,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           token: ${{secrets.GH_PA_TOKEN}}
+          fetch-depth: 100
       - name: Sync release-candidate branch - full sync
         shell: bash
         if: ${{ always() && github.event.inputs.release_type == 'full-release' }}
@@ -38,7 +39,7 @@ jobs:
           git diff ..main | git apply -
           git add .
           git commit -m "Sync from master"
-          #git push
+          git push
           export NEW_COMMIT_ID=$(git rev-parse HEAD)
           echo "NEW_COMMIT_ID=$NEW_COMMIT_ID" >> $GITHUB_ENV
       - name: Sync release-candidate branch - cherry-pick
@@ -49,11 +50,15 @@ jobs:
           git config --global user.email "you@example.com"
           git config --global user.name "Your Name"  
           git branch
-          git fetch origin rc
+          git fetch origin rc --prune
           #git reset --hard rc
           git checkout rc
+          git pull
           git status
           git cherry-pick ${{ github.event.inputs.commit_ids }}
+          git push
+          export NEW_COMMIT_ID=$(git rev-parse HEAD)
+          echo "NEW_COMMIT_ID=$NEW_COMMIT_ID" >> $GITHUB_ENV
       - name: Slack Notification
         uses: rtCamp/action-slack-notify@v2
         env:
