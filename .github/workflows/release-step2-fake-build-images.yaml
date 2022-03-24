@@ -62,7 +62,7 @@ jobs:
             console.log("teeeest");
             let pr_number = 0;
             if (PRs.length === 0){
-              const test1 = await github.rest.pulls.create({
+              const response = await github.rest.pulls.create({
                 title: "❗ release-candidate ➡️ env-production ❗",
                 owner: 'adamwalach',
                 repo: 'github-actions-test',
@@ -71,7 +71,10 @@ jobs:
                 body: '## test \n my new PR'
               });
               console.log("Response:");
-              console.log(test1);
+              if (response.status === 200){
+                pr_number = response.data.number                
+              }
+              console.log(response);
             }else{
               console.log("update");
               pr_number=PRs[0].number;
