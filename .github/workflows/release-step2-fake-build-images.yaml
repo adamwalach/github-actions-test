@@ -57,7 +57,7 @@ jobs:
                    state: 'open',
                    head: 'rc',
                    base: 'prod'
-              })
+              });
             let pr_number;
             if (PRs.length === 0){
               pr_number=0;
@@ -90,7 +90,7 @@ jobs:
         uses: rtCamp/action-slack-notify@v2
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_MESSAGE: "All green, this is the PR: https://github.com/adamwalach/github-action-test/pull/${{steps.set-result.outputs.result}}"
+          SLACK_MESSAGE: "All green, this is the PR to prod: https://github.com/adamwalach/github-action-test/pull/${{steps.set-result.outputs.result}}"
 #      - name: Create Pull Request
 #        uses: peter-evans/create-pull-request@v3
 #        with:
