@@ -71,7 +71,7 @@ jobs:
                 body: '## test \n my new PR'
               });
               console.log("Response:");
-              if (response.status === 200){
+              if (response.status === 201){
                 pr_number = response.data.number                
               }
               console.log(response);
