@@ -70,6 +70,7 @@ jobs:
                 head: 'rc',
                 body: '## test \n my new PR'
               });
+              console.log("Response:");
               console.log(test1);
             }else{
               console.log("update");
