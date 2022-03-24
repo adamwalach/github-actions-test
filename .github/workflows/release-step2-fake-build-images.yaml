@@ -58,9 +58,8 @@ jobs:
                    head: 'rc',
                    base: 'prod'
               });
-            let pr_number;
+            let pr_number = 0;
             if (PRs.length === 0){
-              pr_number=0;
               const test1 = await github.rest.pulls.create({
                 title: "❗ release-candidate ➡️ env-production ❗",
                 owner: 'adamwalach',
