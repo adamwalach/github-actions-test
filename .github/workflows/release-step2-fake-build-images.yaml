@@ -51,6 +51,7 @@ jobs:
         id: set-result
         with:
           script: |
+            console.log("dadasdas")
             const PRs = await github.paginate(github.rest.pulls.list, {
                    owner: 'adamwalach',
                    repo: 'github-actions-test',
@@ -58,6 +59,7 @@ jobs:
                    head: 'rc',
                    base: 'prod'
               });
+            console.log("teeeest");
             let pr_number = 0;
             if (PRs.length === 0){
               const test1 = await github.rest.pulls.create({
@@ -70,7 +72,7 @@ jobs:
               });
               console.log(test1);
             }else{
-              console.log("update")
+              console.log("update");
               pr_number=PRs[0].number;
               constawait github.rest.pulls.update({
                     owner: 'adamwalach',
