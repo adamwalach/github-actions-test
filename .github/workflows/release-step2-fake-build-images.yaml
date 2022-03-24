@@ -71,15 +71,6 @@ jobs:
                 body: '## test \n my new PR'
               });
               //console.log(test1);
-            }else{
-              console.log("update");
-              pr_number=PRs[0].number;
-              constawait github.rest.pulls.update({
-                    owner: 'adamwalach',
-                    repo: 'github-actions-test',
-                    pull_number: PRs[0].number,
-                    body: '## test \n my new PR - update'
-              });
             }
             return pr_number;
           result-encoding: string
