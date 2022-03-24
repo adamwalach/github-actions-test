@@ -24,7 +24,7 @@ jobs:
         uses: rtCamp/action-slack-notify@v2
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_MESSAGE: "images are ready, lets push them, someone needs to approve it: - ${{env.WORKFLOW_URL}}"
+          SLACK_MESSAGE: "images are ready, lets push them to a production registry, someone needs to approve it: - ${{env.WORKFLOW_URL}}"
 
   dummy-push:
     runs-on: ubuntu-latest
