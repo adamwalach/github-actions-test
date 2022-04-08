@@ -30,7 +30,7 @@ jobs:
         if: ${{ always() && github.event.inputs.release_type == 'full-release' }}
         run: |
           git config --global user.email "you@example.com"
-          git config --global user.name "Your Name"  
+          git config --global user.name "${{ github.actor }}"  
           git branch
           git fetch origin rc
           #git reset --hard rc
@@ -38,7 +38,10 @@ jobs:
           git status
           git diff ..main | git apply -
           git add .
-          git commit -m "Sync from master"
+          git commit -m "Sync from master
+          
+          Synchronized by "${{ github.actor }}"
+          "
           git push
           export NEW_COMMIT_ID=$(git rev-parse HEAD)
           echo "NEW_COMMIT_ID=$NEW_COMMIT_ID" >> $GITHUB_ENV
