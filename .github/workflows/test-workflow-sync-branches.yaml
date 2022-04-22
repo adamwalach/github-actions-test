@@ -24,11 +24,29 @@ on:
 jobs:
   say_hi_2:
     runs-on: ubuntu-latest
+    environment: test-deployment
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+        with:
+          token: ${{secrets.GH_PA_TOKEN}}
       - name: Hi123
         shell: bash
         run: |
-          git status
+          git config --global user.email "you@example.com"
+          git config --global user.name "Your Name"  
           git branch
+          git fetch origin rc
+          #git reset --hard rc
+          git checkout rc
+          #git checkout rc
+          git status
+          git diff ..main | git apply -
+          git add .
+          git commit -m "Sync from master"
+          git push
+#      - name: Create Pull Request
+#        uses: peter-evans/create-pull-request@v3
+#        with:
+#          branch: rc
+#          base: main

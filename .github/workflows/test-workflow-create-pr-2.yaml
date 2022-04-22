@@ -1,0 +1,77 @@
+name: Test create PR - new
+
+on:
+  # Manual trigger from the UI
+  workflow_dispatch:
+    inputs:
+      test1:
+        type: choice
+        description: Release type
+        options:
+          - 'Full release'
+          - 'Only cherry picks'
+        required: true
+      test3:
+        description: Commit ID's
+        required: false
+        default: ''
+      test2:
+        description: Skip long running tests
+        type: boolean
+        required: true
+        default: 'false'
+
+jobs:
+  say_hi_2:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+#        with:
+#          token: ${{secrets.GH_PA_TOKEN}}
+#          ref: prod
+      #          pr_template: ".github/PULL_REQUEST_TEMPLATE.md"   # Path to pull request template, requires pr_title to be set, excludes pr_body
+#          pr_milestone: "Milestone 1"                       # Milestone name
+
+      - uses: actions/github-script@v6
+        id: set-result
+        with:
+          script: |
+
+            const PRs = await github.paginate(github.rest.pulls.list, {
+                   owner: 'adamwalach',
+                   repo: 'github-actions-test',
+                   state: 'open',
+                   head: 'rc',
+                   base: 'prod'
+              })
+                        
+            //console.log("PRs");
+            //console.log(PRs[0])
+
+            if (PRs.length === 0){
+              await github.rest.pulls.create({
+                title: "❗ release-candidate ➡️ env-production ❗",
+                owner: 'adamwalach',
+                repo: 'github-actions-test',
+                base: 'prod',
+                head: 'rc',
+                body: '## test \n my new PR'
+              });
+            }else{
+              console.log("update")
+              await github.rest.pulls.update({
+                    owner: 'adamwalach',
+                    repo: 'github-actions-test',
+                    pull_number: PRs[0].number,
+                    body: '## test \n my new PR - update'
+              });
+            }
+            
+            
+            return "Hello!"
+          result-encoding: string
+      - name: Get result
+        run: echo "${{steps.set-result.outputs.result}}"
+
+

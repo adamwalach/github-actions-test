@@ -1,0 +1,40 @@
+name: Test create PR
+
+on:
+  # Manual trigger from the UI
+  workflow_dispatch:
+    inputs:
+      test1:
+        type: choice
+        description: Release type
+        options:
+          - 'Full release'
+          - 'Only cherry picks'
+        required: true
+      test3:
+        description: Commit ID's
+        required: false
+        default: ''
+      test2:
+        description: Skip long running tests
+        type: boolean
+        required: true
+        default: 'false'
+
+jobs:
+  say_hi_2:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          token: ${{secrets.GH_PA_TOKEN}}
+          ref: prod
+#      - name: Reset promotion branch
+#        run: |
+#          git fetch origin main:main
+#          git reset --hard main
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v3
+        with:
+          branch: rc
