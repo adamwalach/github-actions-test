@@ -71,17 +71,17 @@ jobs:
                  run_id: workflowRunID
               });
               console.log(wf);
-              console.log(`Status: ${wf.status}`)
+              console.log(`Status: ${wf.data.status}`)
               // possible values: "queued", "in_progress", or "completed"            
-              if (wf.status === "completed"){
-                  console.log(`Conclusion: ${wf.conclusion}`)
+              if (wf.data.status === "completed"){
+                  console.log(`Conclusion: ${wf.data.conclusion}`)
                   // possible values: "success", "failure", "neutral", "cancelled", 
                   // "skipped", "timed_out", or "action_required"
-                  if (wf.conclusion === "success"){
+                  if (wf.data.conclusion === "success"){
                       console.log("All green")
                       process.exit(0);
                   }
-                  console.log (`Error: previous workflow execution failed, status: ${wf.conclusion}`)
+                  console.log (`Error: previous workflow execution failed, status: ${wf.data.conclusion}`)
                   process.exit(1);
               }
               await new Promise(resolve => setTimeout(resolve, 5000));
