@@ -52,9 +52,10 @@ jobs:
                 }else{
                   console.log("Found")
                   console.log(wf);
-                  workflowRunID = wf.id
+                  workflowRunID = wf.id;
+                  break;
                 }
-                await new Promise(resolve => setTimeout(resolve, 100));
+                //await new Promise(resolve => setTimeout(resolve, 100));
             }
             if (workflowRunID === -1) {
                 console.log (`Error: workflow run not found, status: ${wf.conclusion}`)
@@ -69,7 +70,7 @@ jobs:
                  repo: "github-actions-test",
                  run_id: workflowRunID
               });
-            
+              console.log(wf);
               console.log(`Status: ${wf.status}`)
               // possible values: "queued", "in_progress", or "completed"            
               if (wf.status === "completed"){
