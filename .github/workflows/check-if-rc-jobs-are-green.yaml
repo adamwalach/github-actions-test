@@ -18,7 +18,7 @@ jobs:
         shell: bash
         run: |
           echo "REPO: ${{ env.GITHUB_REPOSITORY }}"
-          sleep 10
+          sleep 30
           echo "END"
       - name: Get previous commit
         id: get_previous_commit
@@ -56,7 +56,7 @@ jobs:
             }
             
             n=0
-            while (n<10){
+            while {
               n++; 
               const wf = await github.rest.actions.getWorkflowRun({
                  owner: "adamwalach",
