@@ -1,0 +1,102 @@
+name: Check If ALL jobs On the RC branch are green
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - test-workflow-branch-protection
+jobs:
+  rc-jobs-check:
+    runs-on: ubuntu-latest
+    name: Check status of previous RC jobs
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          token: ${{secrets.GH_PA_TOKEN}}
+          fetch-depth: 10
+      - name: Check if previous E2E failed
+        shell: bash
+        run: |
+          echo "REPO: ${{ env.GITHUB_REPOSITORY }}"
+          sleep 10
+          echo "END"
+      - name: Get previous commit
+        id: get_previous_commit
+        shell: bash
+        run: |
+          git log
+          git status
+          PREVIOUS_COMMIT_ID=$(git rev-parse 'HEAD^1')
+          echo "::set-output name=PREVIOUS_COMMIT_ID::$PREVIOUS_COMMIT_ID"
+      - name: Check gs
+        uses: actions/github-script@v6
+        with:
+          script: |
+            console.log('Previous commit: ${{ steps.get_previous_commit.outputs.PREVIOUS_COMMIT_ID }}')
+            const yestarday = new Date(Date.now() - 86400000).toISOString().slice(0, 10)
+
+            // status: "in_progress",
+            
+            const workflowRuns = await github.paginate(github.rest.actions.listWorkflowRuns, {
+                 owner: "adamwalach",
+                 repo: "github-actions-test",
+                 created: `>=${yestarday}`,
+                 workflow_id: "check-if-rc-jobs-are-green.yaml"
+            });
+            let workflowRunID=-1;
+            for (const wf of workflowRuns) {
+                if (wf.head_sha !== '${{ steps.get_previous_commit.outputs.PREVIOUS_COMMIT_ID }}'){
+                  console.log ("Unexpected commit id: " + wf.head_sha + " - " + wf.created_at)
+                  //console.log(wf)
+                  //process.exit(1);
+                }else{
+                  console.log("Found")
+                  console.log(wf);
+                  workflowRunID = wf.id
+                }
+            }
+            if (workflowRunID === -1) {
+                console.log (`Error: workflow run not found, status: ${wf.conclusion}`)
+                process.exit(1);
+            }
+            
+            n=0
+            while (n<10){
+              n++; 
+              const wf = await github.rest.actions.getWorkflowRun({
+                 owner: "adamwalach",
+                 repo: "github-actions-test",
+                 run_id: workflowRunID
+              });
+            
+              console.log(`Status: ${wf.status}`)
+              // possible values: "queued", "in_progress", or "completed"            
+              if (wf.status === "completed"){
+                  console.log(`Conclusion: ${wf.conclusion}`)
+                  // possible values: "success", "failure", "neutral", "cancelled", 
+                  // "skipped", "timed_out", or "action_required"
+                  if (wf.conclusion === "success"){
+                      console.log("All green")
+                      process.exit(0);
+                  }
+                  console.log (`Error: previous workflow execution failed, status: ${wf.conclusion}`)
+                  process.exit(1);
+              }
+              await new Promise(resolve => setTimeout(resolve, 5000));
+            }
+
+  dummy-e2e:
+    runs-on: ubuntu-latest
+    if: false
+    name: Dummy e2e test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          token: ${{secrets.GH_PA_TOKEN}}
+      - name: E2E test
+        shell: bash
+        run: |
+          #exit 1
+          sleep 30
+          echo "END"
