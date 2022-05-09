@@ -13,7 +13,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           token: ${{secrets.GH_PA_TOKEN}}
-          fetch-depth: 10
+          fetch-depth: 30
       - name: Check if previous E2E failed
         shell: bash
         run: |
@@ -34,9 +34,6 @@ jobs:
           script: |
             console.log('Previous commit: ${{ steps.get_previous_commit.outputs.PREVIOUS_COMMIT_ID }}')
             const yestarday = new Date(Date.now() - 86400000).toISOString().slice(0, 10)
-
-            // status: "in_progress",
-            
             const workflowRuns = await github.paginate(github.rest.actions.listWorkflowRuns, {
                  owner: "adamwalach",
                  repo: "github-actions-test",
@@ -46,19 +43,15 @@ jobs:
             let workflowRunID=-1;
             for (const wf of workflowRuns) {
                 if (wf.head_sha !== '${{ steps.get_previous_commit.outputs.PREVIOUS_COMMIT_ID }}'){
-                  console.log ("Unexpected commit id: " + wf.head_sha + " - " + wf.created_at)
-                  //console.log(wf)
-                  //process.exit(1);
+                  console.log (`Unexpected commit id: ${wf.head_sha}, ${wf.created_at}`)
                 }else{
-                  console.log("Found")
-                  console.log(wf);
+                  console.log(`Found commit: ${wf.head_sha}` )
                   workflowRunID = wf.id;
                   break;
                 }
-                //await new Promise(resolve => setTimeout(resolve, 100));
             }
             if (workflowRunID === -1) {
-                console.log (`Error: workflow run not found, status: ${wf.conclusion}`)
+                console.log (`Error: workflow run not found`)
                 process.exit(1);
             }
             
