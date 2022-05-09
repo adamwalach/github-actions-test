@@ -18,7 +18,7 @@ jobs:
         shell: bash
         run: |
           echo "REPO: ${{ env.GITHUB_REPOSITORY }}"
-          sleep 10
+          sleep 30
           echo "END"
       - name: Get previous commit
         id: get_previous_commit
@@ -70,7 +70,6 @@ jobs:
                  repo: "github-actions-test",
                  run_id: workflowRunID
               });
-              console.log(wf);
               console.log(`Status: ${wf.data.status}`)
               // possible values: "queued", "in_progress", or "completed"            
               if (wf.data.status === "completed"){
