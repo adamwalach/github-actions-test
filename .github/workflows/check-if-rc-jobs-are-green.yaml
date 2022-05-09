@@ -18,7 +18,7 @@ jobs:
         shell: bash
         run: |
           echo "REPO: ${{ env.GITHUB_REPOSITORY }}"
-          sleep 30
+          sleep 10
           echo "END"
       - name: Get previous commit
         id: get_previous_commit
